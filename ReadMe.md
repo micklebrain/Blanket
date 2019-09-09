@@ -7,7 +7,7 @@ This api has a single endpoint \Blanket\Locations that takes an array of locatio
 Make sure you have [Node.js](http://nodejs.org/) installed.
 
 ```sh
-git clone git@github.com:heroku/node-js-sample.git # or clone your own fork
+git clone https://github.com/white-rose/Blanket.git # or clone your own fork
 cd Blanket
 npm install
 npm start
@@ -24,3 +24,14 @@ heroku open
 ```
 
 This api is currently live at https://blanketlocations.herokuapp.com/Blanket/Locations
+
+## Request Format
+
+The payload for the endpoint is structured as.. with the location names being interchangable
+{
+  "locations" : [ 
+      "Statue of Liberty", 
+      "Miami, FL", 
+      "Paris"
+    ]
+}
