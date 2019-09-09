@@ -88,7 +88,7 @@ app.get('/Blanket/Locations', (req, res) => {
     const start = async () => {
         await verifiedLocations.forEach(async (verifiedLocation) => {
             console.log(verifiedLocation);
-            getCoordinatesForLocation(verifiedLocation);
+            await getCoordinatesForLocation(verifiedLocation);
         })
         res.send(locationCoordinates);
     }
