@@ -17,6 +17,7 @@ const API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
 const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + API_KEY;
 
 function parseLocations(locations) {
+
     locations.forEach(location => {
         verifiedLocations.push(location);
     });
@@ -91,6 +92,8 @@ app.get('/Blanket/Locations', (req, res) => {
             await getCoordinatesForLocation(verifiedLocation);
         })
         res.send(locationCoordinates);
+        locationCoordinates = [];
+        verifiedLocations = [];
     }
 
     start();
