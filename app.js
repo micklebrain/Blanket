@@ -66,7 +66,7 @@ function printCoordinatesOfLocations(locationsJson) {
 };
 
 function nearestCoordinates() {
-    
+
     var shortestDistance = 100000;
     var shortestPlaceInBetween = "";
 
@@ -80,7 +80,7 @@ function nearestCoordinates() {
                 var lng = longitude - longitude2;
                 var lat = latitude - latitude2;
                 // Calculate the distance between two points
-                
+
                 const dist = Math.sqrt((Math.pow(lng, 2) + Math.pow(lat, 2)));
                 if (dist < shortestDistance) {
                     shortestDistance = dist;
@@ -88,17 +88,22 @@ function nearestCoordinates() {
                 }
             }
         }
-        
+
         var locationResponse = {};
         locationResponse.name = locationCoordinates[i].name;
         locationResponse.nearestLocation = shortestPlaceInBetween;
-        response.push(locationResponse);    
-        
+        response.push(locationResponse);
+
         console.log("Response: ");
         console.log(response);
-        
+
     }
 
+}
+
+function validateInput() {
+    if (verifiedLocations.length < 50 || verifiedLocations.length > 100) return false;
+    return true;
 }
 
 // Initialize the app.
@@ -114,9 +119,11 @@ app.get('/Blanket/Locations', (req, res) => {
     // Validate Locations input 
     parseLocations(req.body.locations);
 
+    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
+
     // Veriried Locatins    
     const start = async () => {
-        await verifiedLocations.forEach(async (verifiedLocation) => {        
+        await verifiedLocations.forEach(async (verifiedLocation) => {
             await getCoordinatesForLocation(verifiedLocation);
         })
         await nearestCoordinates();
