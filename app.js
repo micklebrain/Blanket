@@ -15,9 +15,18 @@ const googlePlacesDomain = "maps.googleapis.com/"
 const googlePlacesSearchParameters = "maps/api/place/findplacefromtext/json?input=";
 const API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
 const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + API_KEY;
-var googlePlaceSearchURL = protocol + googlePlacesDomain + googlePlacesSearchParameters + "Statue%20Of%20%20Liberty" + googleApiKeyParemeters;
 
-function getCoordinatesForLocation() {
+function parseLocations(locations) {
+    locations.forEach(location => {
+        verifiedLocations.push(location);
+    });
+}
+
+function getCoordinatesForLocation(locationName) {
+
+    var locationParameter = locationName.split(' ').join('%20');
+
+    var googlePlaceSearchURL = protocol + googlePlacesDomain + googlePlacesSearchParameters + locationParameter + googleApiKeyParemeters;
 
     const request = require('request');
     request(googlePlaceSearchURL, function (error, response, body) {
@@ -39,13 +48,9 @@ function getCoordinatesForLocation() {
 // Define recursive function to print nested values
 function printCoordinatesOfLocations(locationsJson) {
 
-    var latitude = "";
-    var longitude = "";
-    var name = "";
-
-    name = locationsJson['candidates'][0]['name'];
-    latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
-    longitude = locationsJson['candidates'][0]['geometry']['location']['lng'];
+    const name = locationsJson['candidates'][0]['name'];
+    const latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
+    const longitude = locationsJson['candidates'][0]['geometry']['location']['lng'];
 
     console.log('Name: ');
     console.log(name);
@@ -65,12 +70,6 @@ function printCoordinatesOfLocations(locationsJson) {
 
 };
 
-function parseLocations(locations) {
-    locations.forEach(location => {
-        verifiedLocations.push(location);
-    });
-}
-
 // Initialize the app.
 const server = app.listen(process.env.PORT || 8080, function () {
     var port = server.address().port;
@@ -86,13 +85,16 @@ app.get('/Blanket/Locations', (req, res) => {
 
     // Veriried Locatins
     console.log("Locations input: ");
-    verifiedLocations.forEach(verifiedLocation => {
-        console.log(verifiedLocation);
-    })
+    const start = async () => {
+        await verifiedLocations.forEach(async (verifiedLocation) => {
+            console.log(verifiedLocation);
+            getCoordinatesForLocation(verifiedLocation);
+        })
+        res.send(locationCoordinates);
+    }
 
-    // Find coordinates for each location 
-    getCoordinatesForLocation();
+    start();
 
     // console.log(req.body.locations);
-    res.send(req.body.locations);
+
 });
