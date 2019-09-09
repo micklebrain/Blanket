@@ -9,6 +9,7 @@ app.use(bodyParser.json());
 
 var verifiedLocations = [];
 var locationCoordinates = [];
+var response = []
 
 const protocol = "https://";
 const googlePlacesDomain = "maps.googleapis.com/"
@@ -53,13 +54,6 @@ function printCoordinatesOfLocations(locationsJson) {
     const latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
     const longitude = locationsJson['candidates'][0]['geometry']['location']['lng'];
 
-    console.log('Name: ');
-    console.log(name);
-    console.log('Logitude: ');
-    console.log(longitude);
-    console.log('Latitude: ');
-    console.log(latitude);
-
     var blanketLocation = {};
     blanketLocation.name = name;
     blanketLocation.latitude = latitude;
@@ -70,6 +64,42 @@ function printCoordinatesOfLocations(locationsJson) {
     console.log(locationCoordinates);
 
 };
+
+function nearestCoordinates() {
+    
+    var shortestDistance = 100000;
+    var shortestPlaceInBetween = "";
+
+    for (var i = 0; i < locationCoordinates.length; i++) {
+        var longitude = locationCoordinates[i].longitude;
+        var latitude = locationCoordinates[i].latitude;
+        for (var j = 0; j < locationCoordinates.length; j++) {
+            if (j !== i) {
+                var longitude2 = locationCoordinates[j].longitude;
+                var latitude2 = locationCoordinates[j].latitude;
+                var lng = longitude - longitude2;
+                var lat = latitude - latitude2;
+                // Calculate the distance between two points
+                
+                const dist = Math.sqrt((Math.pow(lng, 2) + Math.pow(lat, 2)));
+                if (dist < shortestDistance) {
+                    shortestDistance = dist;
+                    shortestPlaceInBetween = locationCoordinates[j].name;
+                }
+            }
+        }
+        
+        var locationResponse = {};
+        locationResponse.name = locationCoordinates[i].name;
+        locationResponse.nearestLocation = shortestPlaceInBetween;
+        response.push(locationResponse);    
+        
+        console.log("Response: ");
+        console.log(response);
+        
+    }
+
+}
 
 // Initialize the app.
 const server = app.listen(process.env.PORT || 8080, function () {
@@ -84,14 +114,13 @@ app.get('/Blanket/Locations', (req, res) => {
     // Validate Locations input 
     parseLocations(req.body.locations);
 
-    // Veriried Locatins
-    console.log("Locations input: ");
+    // Veriried Locatins    
     const start = async () => {
-        await verifiedLocations.forEach(async (verifiedLocation) => {
-            console.log(verifiedLocation);
+        await verifiedLocations.forEach(async (verifiedLocation) => {        
             await getCoordinatesForLocation(verifiedLocation);
         })
-        res.send(locationCoordinates);
+        await nearestCoordinates();
+        res.send(response);
         locationCoordinates = [];
         verifiedLocations = [];
     }
