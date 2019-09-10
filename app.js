@@ -17,9 +17,9 @@ const googlePlacesSearchParameters = "maps/api/place/findplacefromtext/json?inpu
 const API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
 const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + API_KEY;
 
-function parseLocations(locations) {
-
+async function parseLocations(locations) {
     locations.forEach(location => {
+        fetchCoordinatesForLocation(location);
         verifiedLocations.push(location);
     });
 }
@@ -31,22 +31,31 @@ async function fetchCoordinatesForLocation(locationName) {
     var googlePlaceSearchURL = protocol + googlePlacesDomain + googlePlacesSearchParameters + locationParameter + googleApiKeyParemeters;
 
     const request = require('request');
-    request(googlePlaceSearchURL, function (error, response, body) {
-
+    await request(googlePlaceSearchURL, async function (error, response, body) {
         if (error) {
             console.log("error: ");
             console.log(error);
         } else {            
             // Converting JSON-encoded string to JS object
             var locationsJSON = JSON.parse(body);
-            parseAndAddCoordinates(locationsJSON);
+            const name = locationsJSON['candidates'][0]['name'];
+            const latitude = locationsJSON['candidates'][0]['geometry']['location']['lat'];
+            const longitude = locationsJSON['candidates'][0]['geometry']['location']['lng'];
+        
+            var blanketLocation = {};
+            blanketLocation.name = name;
+            blanketLocation.latitude = latitude;
+            blanketLocation.longitude = longitude;
+            locationCoordinates.push(blanketLocation);
+        
+            // await parseAndAddCoordinates(locationsJSON);
         }
     });
 
 }
 
 // Define recursive function to print nested values
-async function parseAndAddCoordinates(locationsJson) {
+async function parseAndAddCoordinates(locationsJSON) {
 
     const name = locationsJson['candidates'][0]['name'];
     const latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
@@ -99,6 +108,9 @@ async function findNearestNeighbors() {
 
     }
 
+    locationCoordinates = [];
+    verifiedLocations = [];
+
 }
 
 function validateInput() {
@@ -121,17 +133,6 @@ app.get('/Blanket/Locations', (req, res) => {
 
     if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
-    // Veriried Locatins    
-    const fetchCoordinatesForLocations = async () => {
-        await verifiedLocations.forEach(async (verifiedLocation) => {
-            await fetchCoordinatesForLocation(verifiedLocation);
-        })
-        locationCoordinates = [];
-        verifiedLocations = [];
-    }
-
-    fetchCoordinatesForLocations().then(findNearestNeighbors()).then(res.send(response));
-
-    // console.log(req.body.locations);
+    findNearestNeighbors().then(res.send(response));
 
 });
