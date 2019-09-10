@@ -87,10 +87,13 @@ async function findNearestNeighbors() {
     // Use Distance Formula to find nearest coordinates for each pair of coordinates 
     for (var i = 0; i < locationCoordinates.length; i++) {
 
-        if (nearestLocationsMap.has(locationCoordinates[i].name)) {
-            var locationResponse = {};
+        var locationResponse = {};
+        var locationName = locationCoordinates[i].name;
+
+        if (nearestLocationsMap.has(locationName)) {
+            locationResponse = {};
             locationResponse.name = locationCoordinates[i].name;
-            locationResponse.nearestLocation = nearestLocationsMap.get(locationCoordinates[i].name);
+            locationResponse.nearestLocation = nearestLocationsMap.get(locationName);
             nearestLocationsMap.set(locationResponse.nearestLocation, locationResponse.name);
             response.push(locationResponse);
         } else {
@@ -113,7 +116,7 @@ async function findNearestNeighbors() {
             }
 
             var locationResponse = {};
-            locationResponse.name = locationCoordinates[i].name;
+            locationResponse.name = locationName;
             locationResponse.nearestLocation = shortestPlaceInBetween;
             nearestLocationsMap.set(locationResponse.nearestLocation, locationResponse.name);
             response.push(locationResponse);
@@ -121,7 +124,7 @@ async function findNearestNeighbors() {
             shortestPlaceInBetween = "";
         }
     }
-    
+
     // console.log(nearestLocationsMap);
 
     for (var j = 0; j < unknownLocations.length; j++) {
