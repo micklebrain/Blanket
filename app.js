@@ -19,14 +19,14 @@ const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,na
 
 async function parseLocations(locations) {
 
-    var promiseArr = [];
+    var locationsPromises = [];
     
     locations.forEach(async (location) => {
-        await promiseArr.push(fetchCoordinatesForLocation(location));
+        await locationsPromises.push(fetchCoordinatesForLocation(location));
         verifiedLocations.push(location);
     });
 
-    await Promise.all(promiseArr).then(findNearestNeighbors());
+    await Promise.all(locationsPromises).then(findNearestNeighbors());
 }
 
 async function fetchCoordinatesForLocation(locationName) {
@@ -49,20 +49,23 @@ async function fetchCoordinatesForLocation(locationName) {
         } else {
             // Converting JSON-encoded string to JS object
             var locationsJSON = JSON.parse(body);
-            const name = locationsJSON[CANDIDATES][0]['name'];
-            const latitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LATITUDE];
-            const longitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LONGITUDE];
+            if (locationsJSON[CANDIDATES].length !== 0) {
+                const name = locationsJSON[CANDIDATES][0]['name'];
+                const latitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LATITUDE];
+                const longitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LONGITUDE];
 
-            var blanketLocation = {};
-            blanketLocation.name = name;
-            blanketLocation.latitude = latitude;
-            blanketLocation.longitude = longitude;
-            console.log('Pushing new location');
-            locationCoordinates.push(blanketLocation);
-            resolve();
-            // if (err) reject(err);
-            
-            // await parseAndAddCoordinates(locationsJSON);
+                var blanketLocation = {};
+                blanketLocation.name = name;
+                blanketLocation.latitude = latitude;
+                blanketLocation.longitude = longitude;
+                console.log('Pushing new location');
+                locationCoordinates.push(blanketLocation);
+                resolve();
+                // if (err) reject(err);
+                // await parseAndAddCoordinates(locationsJSON);
+            } else {
+                resolve();
+            }
         }
     }));
 
@@ -79,9 +82,6 @@ async function parseAndAddCoordinates(locationsJSON) {
     blanketLocation.latitude = latitude;
     blanketLocation.longitude = longitude;
     locationCoordinates.push(blanketLocation);
-
-    // console.log("All coordinates");
-    // console.log(locationCoordinates);
 
 };
 
