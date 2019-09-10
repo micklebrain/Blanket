@@ -300,6 +300,9 @@ Response body:
         {
             "name": "Aurora at North Bethesda Center",
             "nearestLocation": "Washington"
+        },
+        {
+            "UnverifiedLocationName": "Unknown area"
         }
         ]
     }
