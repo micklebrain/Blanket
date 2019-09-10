@@ -36,13 +36,13 @@ function getCoordinatesForLocation(locationName) {
         if (error) {
             console.log("error: ");
             console.log(error);
+        } else {
+            console.log("Potential Locations ");
+            // Converting JSON-encoded string to JS object
+            // Converting JSON object to JS object
+            var locationsJSON = JSON.parse(body);
+            printCoordinatesOfLocations(locationsJSON);
         }
-
-        console.log("Potential Locations ");
-        // Converting JSON-encoded string to JS object
-        // Converting JSON object to JS object
-        var locationsJSON = JSON.parse(body);
-        printCoordinatesOfLocations(locationsJSON);
     });
 
 }
@@ -93,6 +93,8 @@ function nearestCoordinates() {
         locationResponse.name = locationCoordinates[i].name;
         locationResponse.nearestLocation = shortestPlaceInBetween;
         response.push(locationResponse);
+        shortestDistance = 100000;
+        shortestPlaceInBetween = "";
 
         console.log("Response: ");
         console.log(response);
@@ -119,15 +121,15 @@ app.get('/Blanket/Locations', (req, res) => {
     // Validate Locations input 
     parseLocations(req.body.locations);
 
-    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
+    // if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
     // Veriried Locatins    
     const start = async () => {
         await verifiedLocations.forEach(async (verifiedLocation) => {
             await getCoordinatesForLocation(verifiedLocation);
         })
-        await nearestCoordinates();
-        res.send(response);
+        await nearestCoordinates();    
+        res.send(response);    
         locationCoordinates = [];
         verifiedLocations = [];
     }
