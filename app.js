@@ -144,7 +144,7 @@ app.get('/Blanket/Locations', async (req, res) => {
     // Validate Locations input 
     await parseLocations(req.body.locations);
 
-    // if (!validateInput()) res.send("Number of Locations must between 50 and 100");
+    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
     findNearestNeighbors().then(res.send(response));
 
