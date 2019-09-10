@@ -7,6 +7,7 @@ var cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json());
 
+var unverifiedLocations = [];
 var verifiedLocations = [];
 var locationCoordinates = [];
 var response = []
@@ -63,6 +64,9 @@ async function fetchCoordinatesForLocation(locationName) {
                 // if (err) reject(err);
                 // await parseAndAddCoordinates(locationsJSON);
             } else {
+                var unknownLocationJSON = {}
+                unknownLocationJSON.UnverifiedLocationName = locationName
+                unverifiedLocations.push(unknownLocationJSON);                
                 resolve();
             }
         }
@@ -74,9 +78,6 @@ async function findNearestNeighbors() {
 
     var shortestDistance = 100000;
     var shortestPlaceInBetween = "";
-
-    console.log("Location Coordinates length");
-    console.log(locationCoordinates.length);
 
     for (var i = 0; i < locationCoordinates.length; i++) {
         var longitude = locationCoordinates[i].longitude;
@@ -106,6 +107,10 @@ async function findNearestNeighbors() {
 
     }
 
+    for (var j = 0; j < unverifiedLocations.length; j++) {
+        response.push(unverifiedLocations[j]);
+    }
+
     locationCoordinates = [];
     verifiedLocations = [];
 
@@ -130,6 +135,8 @@ app.get('/blanket/locations', async (req, res) => {
     await parseLocations(req.body.locations);
 
     if (!validateInput()) res.status(400).send("Number of Locations must between 50 and 100");
-    else findNearestNeighbors().then(res.send(response));
+    else findNearestNeighbors().then(res.send(
+        response
+    ));
 
 });
