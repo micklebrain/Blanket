@@ -1,6 +1,6 @@
 # Locations API
 
-This api has a single endpoint \Blanket\Locations that takes an array of locations in the body and returns the nearsest location of the other endpoints. The location name is passed to the Google Places API to make an asynchronous request to get back the coordinates of the location. The distance formula is then used to find the next closest locatin from each valid location.
+This api has a single endpoint \blanket\locations that takes an array of locations in the body and returns the nearsest location of the other endpoints. The location name is passed to the Google Places API to make an asynchronous request to get back the coordinates of the location. The distance formula is then used to find the next closest locatin from each valid location.
 
 ## Running Locally
 
