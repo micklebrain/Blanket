@@ -20,7 +20,7 @@ const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,na
 async function parseLocations(locations) {
 
     var locationsPromises = [];
-    
+
     locations.forEach(async (location) => {
         await locationsPromises.push(fetchCoordinatesForLocation(location));
         verifiedLocations.push(location);
@@ -42,7 +42,7 @@ async function fetchCoordinatesForLocation(locationName) {
 
     const request = require('request-promise');
 
-    return new Promise ((resolve, reject) => request(googlePlaceSearchURL, async function (error, response, body) {
+    return new Promise((resolve, reject) => request(googlePlaceSearchURL, async function (error, response, body) {
         if (error) {
             console.log("error: ");
             console.log(error);
