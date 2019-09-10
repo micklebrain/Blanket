@@ -121,7 +121,7 @@ app.get('/Blanket/Locations', (req, res) => {
     // Validate Locations input 
     parseLocations(req.body.locations);
 
-    // if (!validateInput()) res.send("Number of Locations must between 50 and 100");
+    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
     // Veriried Locatins    
     const start = async () => {
