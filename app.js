@@ -7,7 +7,7 @@ var cors = require('cors');
 app.use(cors());
 app.use(bodyParser.json());
 
-var unverifiedLocations = [];
+var unknownLocations = [];
 var verifiedLocations = [];
 var locationCoordinates = [];
 var response = []
@@ -15,8 +15,8 @@ var response = []
 const protocol = "https://";
 const googlePlacesDomain = "maps.googleapis.com/"
 const googlePlacesSearchParameters = "maps/api/place/findplacefromtext/json?input=";
-const API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
-const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + API_KEY;
+const GOOGLE_PLACES_API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
+const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + GOOGLE_PLACES_API_KEY;
 
 async function parseLocations(locations) {
 
@@ -27,7 +27,7 @@ async function parseLocations(locations) {
         verifiedLocations.push(location);
     });
 
-    await Promise.all(locationsPromises).then(findNearestNeighbors());
+    await Promise.all(locationsPromises);
 }
 
 async function fetchCoordinatesForLocation(locationName) {
@@ -43,7 +43,7 @@ async function fetchCoordinatesForLocation(locationName) {
 
     const request = require('request-promise');
 
-    return new Promise((resolve, reject) => request(googlePlaceSearchURL, async function (error, response, body) {
+    return new Promise((resolve, _reject) => request(googlePlaceSearchURL, async function (error, _response, body) {
         if (error) {
             console.log("error: ");
             console.log(error);
@@ -66,7 +66,7 @@ async function fetchCoordinatesForLocation(locationName) {
             } else {
                 var unknownLocationJSON = {}
                 unknownLocationJSON.UnknownLocationName = locationName
-                unverifiedLocations.push(unknownLocationJSON);                
+                unknownLocations.push(unknownLocationJSON);
                 resolve();
             }
         }
@@ -79,6 +79,10 @@ async function findNearestNeighbors() {
     var shortestDistance = 100000;
     var shortestPlaceInBetween = "";
 
+    console.log("Number of locations: ");
+    console.log(locationCoordinates.length);
+
+    // Use Distance Formula to find nearest coordinates for each pair of coordinates 
     for (var i = 0; i < locationCoordinates.length; i++) {
         var longitude = locationCoordinates[i].longitude;
         var latitude = locationCoordinates[i].latitude;
@@ -104,15 +108,15 @@ async function findNearestNeighbors() {
         response.push(locationResponse);
         shortestDistance = 100000;
         shortestPlaceInBetween = "";
-
     }
 
-    for (var j = 0; j < unverifiedLocations.length; j++) {
-        response.push(unverifiedLocations[j]);
+    for (var j = 0; j < unknownLocations.length; j++) {
+        response.push(unknownLocations[j]);
     }
 
     locationCoordinates = [];
     verifiedLocations = [];
+    unknownLocations = [];
 
 }
 
@@ -135,8 +139,6 @@ app.get('/blanket/locations', async (req, res) => {
     await parseLocations(req.body.locations);
 
     if (!validateInput()) res.status(400).send("Number of Locations must between 50 and 100");
-    else findNearestNeighbors().then(res.send(
-        response
-    ));
+    else findNearestNeighbors().then(res.send(response));
 
 });
