@@ -65,7 +65,7 @@ async function fetchCoordinatesForLocation(locationName) {
                 // await parseAndAddCoordinates(locationsJSON);
             } else {
                 var unknownLocationJSON = {}
-                unknownLocationJSON.UnverifiedLocationName = locationName
+                unknownLocationJSON.UnknownLocationName = locationName
                 unverifiedLocations.push(unknownLocationJSON);                
                 resolve();
             }

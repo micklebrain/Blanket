@@ -28,7 +28,8 @@ This api is currently live at https://blanketlocations.herokuapp.com/blanket/loc
 ## Requests
 
 * If Google Maps Places API does not recognize location name then it will be ignored when finding the nearest location
-* Assumption from instructions is that payloads must contain between 50-100 locations
+* Instructions state that the payloads must contain between 50-100 locations
+* Unknown Location names will be included in response with key UnknownLocation without any nearestlocation
 
 ## Request & Response Examples
 
@@ -300,6 +301,9 @@ Response body:
         {
             "name": "Aurora at North Bethesda Center",
             "nearestLocation": "Washington"
+        },
+        {
+            "UnverifiedLocationName": "Unknown area"
         }
         ]
     }
