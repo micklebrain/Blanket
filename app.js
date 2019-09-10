@@ -139,7 +139,7 @@ const server = app.listen(process.env.PORT || 8080, function () {
 
 app.get('/health', (req, res) => res.send('Application is healthy'));
 
-app.get('/Blanket/Locations', async (req, res) => {
+app.get('/blanket/locations', async (req, res) => {
 
     // Validate Locations input 
     await parseLocations(req.body.locations);
