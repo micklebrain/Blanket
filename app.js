@@ -57,8 +57,7 @@ async function fetchCoordinatesForLocation(locationName) {
                 var blanketLocation = {};
                 blanketLocation.name = name;
                 blanketLocation.latitude = latitude;
-                blanketLocation.longitude = longitude;
-                console.log('Pushing new location');
+                blanketLocation.longitude = longitude;                
                 locationCoordinates.push(blanketLocation);
                 resolve();
                 // if (err) reject(err);
@@ -144,8 +143,7 @@ app.get('/blanket/locations', async (req, res) => {
     // Validate Locations input 
     await parseLocations(req.body.locations);
 
-    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
-
-    findNearestNeighbors().then(res.send(response));
+    if (!validateInput()) res.status(400).send("Number of Locations must between 50 and 100");
+    else findNearestNeighbors().then(res.send(response));
 
 });
