@@ -18,43 +18,56 @@ const API_KEY = "AIzaSyC9VCYHJUjZKap_qj22RkOYCYH5POTlje4";
 const googleApiKeyParemeters = "&inputtype=textquery&fields=formatted_address,name,geometry&key=" + API_KEY;
 
 async function parseLocations(locations) {
-    locations.forEach(location => {
-        fetchCoordinatesForLocation(location);
+
+    var promiseArr = [];
+    
+    locations.forEach(async (location) => {
+        await promiseArr.push(fetchCoordinatesForLocation(location));
         verifiedLocations.push(location);
     });
+
+    await Promise.all(promiseArr).then(findNearestNeighbors());
 }
 
 async function fetchCoordinatesForLocation(locationName) {
 
-    var locationParameter = locationName.split(' ').join('%20');
+    const CANDIDATES = 'candidates';
+    const GEOMETRY = 'geometry';
+    const LOCATION = 'location';
+    const LATITUDE = 'lat';
+    const LONGITUDE = 'lng';
 
+    var locationParameter = locationName.split(' ').join('%20');
     var googlePlaceSearchURL = protocol + googlePlacesDomain + googlePlacesSearchParameters + locationParameter + googleApiKeyParemeters;
 
-    const request = require('request');
-    await request(googlePlaceSearchURL, async function (error, response, body) {
+    const request = require('request-promise');
+
+    return new Promise ((resolve, reject) => request(googlePlaceSearchURL, async function (error, response, body) {
         if (error) {
             console.log("error: ");
             console.log(error);
-        } else {            
+        } else {
             // Converting JSON-encoded string to JS object
             var locationsJSON = JSON.parse(body);
-            const name = locationsJSON['candidates'][0]['name'];
-            const latitude = locationsJSON['candidates'][0]['geometry']['location']['lat'];
-            const longitude = locationsJSON['candidates'][0]['geometry']['location']['lng'];
-        
+            const name = locationsJSON[CANDIDATES][0]['name'];
+            const latitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LATITUDE];
+            const longitude = locationsJSON[CANDIDATES][0][GEOMETRY][LOCATION][LONGITUDE];
+
             var blanketLocation = {};
             blanketLocation.name = name;
             blanketLocation.latitude = latitude;
             blanketLocation.longitude = longitude;
+            console.log('Pushing new location');
             locationCoordinates.push(blanketLocation);
-        
+            resolve();
+            // if (err) reject(err);
+            
             // await parseAndAddCoordinates(locationsJSON);
         }
-    });
+    }));
 
 }
 
-// Define recursive function to print nested values
 async function parseAndAddCoordinates(locationsJSON) {
 
     const name = locationsJson['candidates'][0]['name'];
@@ -126,12 +139,12 @@ const server = app.listen(process.env.PORT || 8080, function () {
 
 app.get('/health', (req, res) => res.send('Application is healthy'));
 
-app.get('/Blanket/Locations', (req, res) => {
+app.get('/Blanket/Locations', async (req, res) => {
 
     // Validate Locations input 
-    parseLocations(req.body.locations);
+    await parseLocations(req.body.locations);
 
-    if (!validateInput()) res.send("Number of Locations must between 50 and 100");
+    // if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
     findNearestNeighbors().then(res.send(response));
 
