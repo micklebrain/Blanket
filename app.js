@@ -131,12 +131,12 @@ async function findNearestNeighbors() {
     }
 
     locationCoordinates = [];
-    verifiedLocations = [];
+    verifiedLocations.length = 0;
     unknownLocations = [];
 
 }
 
-function validateInput() {
+async function validateInput() {
     if (verifiedLocations.length < 50 || verifiedLocations.length > 100) return false;
     return true;
 }
@@ -154,7 +154,7 @@ app.get('/blanket/locations', async (req, res) => {
     // Validate Locations input 
     await parseLocations(req.body.locations);
 
-    if (!validateInput()) res.status(400).send("Number of Locations must between 50 and 100");
-    else findNearestNeighbors().then(res.send(response));
+    if (await !validateInput()) res.status(400).send("Number of Locations must between 50 and 100");
+    else findNearestNeighbors().then(res.send(response))
 
 });
