@@ -1,6 +1,6 @@
 # Locations API
 
-This api has a single endpoint \Blanket\Locations that takes an array of locations in the body and returns the nearsest location from each other of the given locations
+This api has a single endpoint \Blanket\Locations that takes an array of locations in the body and returns the nearsest location of the other endpoints. The location name is passed to the Google Places API to make an asynchronous request to get back the coordinates of the location. The distance formula is then used to find the next closest locatin from each valid location.
 
 ## Running Locally
 
@@ -18,7 +18,7 @@ Your app should now be running on [localhost:8080](http://localhost:8080/).
 ## Deploying to Heroku
 
 ```
-heroku create
+Set git remote heroku - https://git.heroku.com/blanketlocations.git
 git push heroku master
 heroku open
 ```
@@ -28,6 +28,7 @@ This api is currently live at https://blanketlocations.herokuapp.com/blanket/loc
 ## Requests
 
 * If Google Maps Places API does not recognize location name then it will be ignored when finding the nearest location
+* Assumption from instructions is that payloads mustcontain between 50-100 locations
 
 ## Request & Response Examples
 

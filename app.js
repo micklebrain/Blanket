@@ -57,7 +57,7 @@ async function fetchCoordinatesForLocation(locationName) {
                 var blanketLocation = {};
                 blanketLocation.name = name;
                 blanketLocation.latitude = latitude;
-                blanketLocation.longitude = longitude;                
+                blanketLocation.longitude = longitude;
                 locationCoordinates.push(blanketLocation);
                 resolve();
                 // if (err) reject(err);
