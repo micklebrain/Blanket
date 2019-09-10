@@ -82,33 +82,47 @@ async function findNearestNeighbors() {
     console.log("Number of locations: ");
     console.log(locationCoordinates.length);
 
+    var nearestLocationsMap = new Map();
+
     // Use Distance Formula to find nearest coordinates for each pair of coordinates 
     for (var i = 0; i < locationCoordinates.length; i++) {
-        var longitude = locationCoordinates[i].longitude;
-        var latitude = locationCoordinates[i].latitude;
-        for (var j = 0; j < locationCoordinates.length; j++) {
-            if (j !== i) {
-                var longitude2 = locationCoordinates[j].longitude;
-                var latitude2 = locationCoordinates[j].latitude;
-                var lng = longitude - longitude2;
-                var lat = latitude - latitude2;
-                // Calculate the distance between two points
 
-                const dist = Math.sqrt((Math.pow(lng, 2) + Math.pow(lat, 2)));
-                if (dist < shortestDistance) {
-                    shortestDistance = dist;
-                    shortestPlaceInBetween = locationCoordinates[j].name;
+        if (nearestLocationsMap.has(locationCoordinates[i].name)) {
+            var locationResponse = {};
+            locationResponse.name = locationCoordinates[i].name;
+            locationResponse.nearestLocation = nearestLocationsMap.get(locationCoordinates[i].name);
+            nearestLocationsMap.set(locationResponse.nearestLocation, locationResponse.name);
+            response.push(locationResponse);
+        } else {
+            var longitude = locationCoordinates[i].longitude;
+            var latitude = locationCoordinates[i].latitude;
+            for (var j = 0; j < locationCoordinates.length; j++) {
+                if (j !== i) {
+                    var longitude2 = locationCoordinates[j].longitude;
+                    var latitude2 = locationCoordinates[j].latitude;
+                    var lng = longitude - longitude2;
+                    var lat = latitude - latitude2;
+                    // Calculate the distance between two points
+
+                    const dist = Math.sqrt((Math.pow(lng, 2) + Math.pow(lat, 2)));
+                    if (dist < shortestDistance) {
+                        shortestDistance = dist;
+                        shortestPlaceInBetween = locationCoordinates[j].name;
+                    }
                 }
             }
-        }
 
-        var locationResponse = {};
-        locationResponse.name = locationCoordinates[i].name;
-        locationResponse.nearestLocation = shortestPlaceInBetween;
-        response.push(locationResponse);
-        shortestDistance = 100000;
-        shortestPlaceInBetween = "";
+            var locationResponse = {};
+            locationResponse.name = locationCoordinates[i].name;
+            locationResponse.nearestLocation = shortestPlaceInBetween;
+            nearestLocationsMap.set(locationResponse.nearestLocation, locationResponse.name);
+            response.push(locationResponse);
+            shortestDistance = 100000;
+            shortestPlaceInBetween = "";
+        }
     }
+    
+    // console.log(nearestLocationsMap);
 
     for (var j = 0; j < unknownLocations.length; j++) {
         response.push(unknownLocations[j]);
