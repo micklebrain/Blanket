@@ -37,7 +37,7 @@ This api is currently live at https://blanketlocations.herokuapp.com/blanket/loc
 
   - [GET /Blanket/Locations](#get-locations)
 
-### GET /Blanket/Locations
+### GET /blanket/locations
 
 Example: https://blanketlocations.herokuapp.com/blanket/locations
 
