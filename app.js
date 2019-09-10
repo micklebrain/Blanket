@@ -70,20 +70,6 @@ async function fetchCoordinatesForLocation(locationName) {
 
 }
 
-async function parseAndAddCoordinates(locationsJSON) {
-
-    const name = locationsJson['candidates'][0]['name'];
-    const latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
-    const longitude = locationsJson['candidates'][0]['geometry']['location']['lng'];
-
-    var blanketLocation = {};
-    blanketLocation.name = name;
-    blanketLocation.latitude = latitude;
-    blanketLocation.longitude = longitude;
-    locationCoordinates.push(blanketLocation);
-
-};
-
 async function findNearestNeighbors() {
 
     var shortestDistance = 100000;
