@@ -24,7 +24,7 @@ function parseLocations(locations) {
     });
 }
 
-function getCoordinatesForLocation(locationName) {
+async function fetchCoordinatesForLocation(locationName) {
 
     var locationParameter = locationName.split(' ').join('%20');
 
@@ -36,19 +36,17 @@ function getCoordinatesForLocation(locationName) {
         if (error) {
             console.log("error: ");
             console.log(error);
-        } else {
-            console.log("Potential Locations ");
+        } else {            
             // Converting JSON-encoded string to JS object
-            // Converting JSON object to JS object
             var locationsJSON = JSON.parse(body);
-            printCoordinatesOfLocations(locationsJSON);
+            parseAndAddCoordinates(locationsJSON);
         }
     });
 
 }
 
 // Define recursive function to print nested values
-function printCoordinatesOfLocations(locationsJson) {
+async function parseAndAddCoordinates(locationsJson) {
 
     const name = locationsJson['candidates'][0]['name'];
     const latitude = locationsJson['candidates'][0]['geometry']['location']['lat'];
@@ -60,15 +58,18 @@ function printCoordinatesOfLocations(locationsJson) {
     blanketLocation.longitude = longitude;
     locationCoordinates.push(blanketLocation);
 
-    console.log("All coordinates");
-    console.log(locationCoordinates);
+    // console.log("All coordinates");
+    // console.log(locationCoordinates);
 
 };
 
-function nearestCoordinates() {
+async function findNearestNeighbors() {
 
     var shortestDistance = 100000;
     var shortestPlaceInBetween = "";
+
+    console.log("Location Coordinates length");
+    console.log(locationCoordinates.length);
 
     for (var i = 0; i < locationCoordinates.length; i++) {
         var longitude = locationCoordinates[i].longitude;
@@ -96,9 +97,6 @@ function nearestCoordinates() {
         shortestDistance = 100000;
         shortestPlaceInBetween = "";
 
-        console.log("Response: ");
-        console.log(response);
-
     }
 
 }
@@ -124,17 +122,15 @@ app.get('/Blanket/Locations', (req, res) => {
     if (!validateInput()) res.send("Number of Locations must between 50 and 100");
 
     // Veriried Locatins    
-    const start = async () => {
+    const fetchCoordinatesForLocations = async () => {
         await verifiedLocations.forEach(async (verifiedLocation) => {
-            await getCoordinatesForLocation(verifiedLocation);
+            await fetchCoordinatesForLocation(verifiedLocation);
         })
-        await nearestCoordinates();    
-        res.send(response);    
         locationCoordinates = [];
         verifiedLocations = [];
     }
 
-    start();
+    fetchCoordinatesForLocations().then(findNearestNeighbors()).then(res.send(response));
 
     // console.log(req.body.locations);
 
