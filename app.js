@@ -8,7 +8,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 var unknownLocations = [];
-var verifiedLocations = [];
+var verifiedLocations = new Set();
 var locationCoordinates = [];
 var response = []
 
@@ -24,7 +24,7 @@ async function parseLocations(locations) {
 
     locations.forEach(async (location) => {
         await locationsPromises.push(fetchCoordinatesForLocation(location));
-        verifiedLocations.push(location);
+        verifiedLocations.add(location);
     });
 
     await Promise.all(locationsPromises);
@@ -106,7 +106,6 @@ async function findNearestNeighbors() {
                     var lng = longitude - longitude2;
                     var lat = latitude - latitude2;
                     // Calculate the distance between two points
-
                     const dist = Math.sqrt((Math.pow(lng, 2) + Math.pow(lat, 2)));
                     if (dist < shortestDistance) {
                         shortestDistance = dist;
